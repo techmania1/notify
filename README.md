@@ -1,2 +1,2 @@
 # notify
-Notify is for Techmania
+Notify is for Techmania!!!
