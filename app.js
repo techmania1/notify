@@ -26,7 +26,7 @@ app.use(function(req, res, next) {
 
 // https://scotch.io/tutorials/using-mongoosejs-in-node-js-and-mongodb-applications
 
-// drop all
+// drop all data
 app.post('/api/dropAll', function(req, res) {
   try {
     console.log("dropping all data!"); // TODO remove
@@ -54,7 +54,7 @@ app.get('/api/users', function(req, res) {
 
 // get user by id
 app.get('/api/userById/:id', function(req, res) {
-  User.findById(eq.params.id, function(err, result) {
+  User.findById(req.params.id, function(err, result) {
     if(err) {
       console.log(err);
       res.json(err);
@@ -80,55 +80,20 @@ app.post('/api/user', function(req, res) {
     } else {
       console.log(result);
       res.json(result);
-    }
+    };
   });
 });
 
 // update user
 app.put('/api/user/:id', function(req, res) {
-  User.findById(req.params.id, function(err, user) {
-    if(err) {
-      console.log(err);
-      res.json(err);
-    } else {
-      // update
-      if(req.body.name) {
-        user.name = req.body.name;
-        console.log("updating name=>"+req.body.name);
-      }
-      if(req.body.phone) {
-        user.phone = req.body.phone;
-        console.log("updating phone=>"+req.body.phone);
-      }
-      if(req.body.sms_enabled) {
-        user.sms_enabled = req.body.sms_enabled;
-        console.log("updating sms_enabled=>"+req.body.sms_enabled);
-      }
-
-      // save
-      user.save(function(err, result) {
-        if(err) {
-          console.log(err);
-          res.json(err);
-        } else {
-          console.log(result);
-          res.json(result);
-        }
-      });
-    }
-});
-  var user = new User({
-    name: req.body.name,
-    phone: req.body.phone
-  });
-  user.save(function(err, result) {
-    if(err) {
-      console.log(err);
-      res.json(err);
-    } else {
-      console.log(result);
-      res.json(result);
-    }
+  User.findOneAndUpdate({ _id: req.params.id }, req.body, function(err, user) {
+      if(err) {
+        console.log(err);
+        res.json(err);
+      } else {
+        console.log(user);
+        res.json(user);
+      };
   });
 });
 
@@ -143,6 +108,11 @@ app.get('/api/voice', function(req, res) {
   res.sendFile(DATA_FILE);
 });
 
+app.post('/api/voice', function(req, res) {
+  console.log(req.body); // TODO remove
+  res.json(req.body);
+});
+
 app.get('/api/sms2', function(req, res) {
   var DATA_FILE = path.join(__dirname, '/public/new_sms2.txt');
   res.sendFile(DATA_FILE);
@@ -154,6 +124,11 @@ app.get('/api/sms', function(req, res) {
   var DATA_FILE = path.join(__dirname, '/public/new_sms.json');
   res.set('Content-Type', 'application/json');
   res.sendFile(DATA_FILE);
+});
+
+app.post('/api/sms', function(req, res) {
+  console.log(req.body); // TODO remove
+  res.json(req.body);
 });
 
 // Twillio status callback
