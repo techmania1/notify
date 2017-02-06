@@ -25,7 +25,7 @@ module.exports = {
       var self = this;
       $.ajax({
         method: "GET",
-        url: "/users.json",
+        url: "/api/getUsers",
         data: { id: this.$route.params.id }
       })
       .done(function( data ) {
