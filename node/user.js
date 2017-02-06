@@ -5,7 +5,7 @@ var Schema = mongoose.Schema;
 var userSchema = new Schema({
   name: { type: String, required: true, unique: true },
   phone: { type: String, required: true },
-  sms_enabled: { type: Boolean, required: false }
+  sms_enabled: { type: Boolean, required: true }
 });
 
 // model
