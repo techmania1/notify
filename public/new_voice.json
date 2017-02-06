@@ -1,7 +1,7 @@
-[{
+{
 	"user_msg_id": 2,
 	"from_phone": "+19722036643",
 	"to_phone": "+12145522842",
 	"msg": "Hello Ricky, this is a text to voice call",
 	"twillio_cb_url": "http://techmania.systems/api/twillioCb"
-}]
+}
