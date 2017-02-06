@@ -35,20 +35,15 @@ app.get('/api/sms', function(req, res) {
   res.sendFile(DATA_FILE);
 });
 
-app.post('/api/voice', function(req, res) {
-  console.log("post voice"); // TODO remove
-  res.send(200);
-});
-
-app.post('/api/sms', function(req, res) {
-  console.log("post sms"); // TODO remove
-  res.send(200);
+app.post('/api/send', function(req, res) {
+  console.log("post send"); // TODO remove
+  res.json({ success: true });
 });
 
 // Twillio status callback
 app.post('/api/twillio_cb', function(req, res) {
   console.log("post twillio callback"); // TODO remove
-  res.send(200);
+  res.json({ success: true });
 });
 
 
