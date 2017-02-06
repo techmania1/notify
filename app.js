@@ -1,9 +1,11 @@
 var path = require('path');
 var express = require('express');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
 var app = express();
 
 app.set('port', (process.env.PORT || 3000));
+mongoose.connect('mongodb://localhost/notifydb');
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/dist', express.static(path.join(__dirname, 'dist')));
 app.use(bodyParser.json());
@@ -41,7 +43,7 @@ app.post('/api/send', function(req, res) {
 });
 
 // Twillio status callback
-app.post('/api/twillio_cb', function(req, res) {
+app.post('/api/twillioCb', function(req, res) {
   console.log("post twillio callback"); // TODO remove
   res.json({ success: true });
 });
