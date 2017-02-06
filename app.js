@@ -143,6 +143,13 @@ app.get('/api/voice', function(req, res) {
   res.sendFile(DATA_FILE);
 });
 
+app.get('/api/sms2', function(req, res) {
+  var DATA_FILE = path.join(__dirname, '/public/new_sms2.txt');
+  res.sendFile(DATA_FILE);
+});
+
+
+
 app.get('/api/sms', function(req, res) {
   var DATA_FILE = path.join(__dirname, '/public/new_sms.json');
   res.set('Content-Type', 'application/json');
