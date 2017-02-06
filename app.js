@@ -20,16 +20,16 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.get('/', function(req, res) {
-  var DATA_FILE = path.join(__dirname, 'index.html');
-  res.sendFile(DATA_FILE);
-});
-
 app.get('/api/getUsers', function(req, res) {
   var DATA_FILE = path.join(__dirname, '/public/users.json');
   res.sendFile(DATA_FILE);
 });
 
+app.get('/*', function(req, res) {
+  var DATA_FILE = path.join(__dirname, 'index.html');
+  res.sendFile(DATA_FILE);
+});
+
 app.listen(app.get('port'), function() {
-  console.log('Server started on port' + app.get('port'));
+  console.log('Server started on port:' + app.get('port'));
 });
