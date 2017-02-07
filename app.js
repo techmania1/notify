@@ -218,6 +218,87 @@ app.post('/api/sms', function(req, res) {
 });
 
 // boomi
+app.get('/api/voiceBoomi_NEW', function(req, res) {
+  // find active messages
+  //var isFound = false;
+  //var boomi = {};
+  //var filter = {};
+
+  /*var filter = {
+  	"status": "active",
+  	"voiceUsers": [{
+  		"status": "boomi-queued"
+  	}]
+  };*/
+
+  var voiceUserStatuses = ['boomi-queued'];
+  Msg.find({status:'active'})
+    //.populate('roles', null, { name: { $in: roles } } )
+    //.sort({'_id': 1})
+    .where('voiceUsers.status').in(voiceUserStatuses)
+    .exec(function (err, msg) {
+
+      // loop through messages
+      msg.forEach(function(message) {
+        console.log(message.msg);
+      });
+
+        /*users = users.filter(function(user){
+            return user.roles.length;
+        });*/
+
+        /*msg.save(function(err, msgNew) {
+          if (err) throw err;
+          console.log(msgNew);
+          res.send(msg);
+        });*/
+
+        console.log(msg);
+        res.send(msg);
+
+
+    });
+
+
+/*  Msg.find(filter, function(err, msg) {
+    if(err) {
+      console.log(err);
+      res.status(500).json(err);
+    } else {
+      // loop through messages
+      msg.forEach(function(message) {
+          console.log(message.msg);
+          message.voiceUsers.forEach(function(voiceUsers) {
+            if (isFound==false) {
+              if(voiceUsers.name == 'Ricky Lewin') { // TODO remove!!!
+              //if(voiceUsers.status == 'boomi-queued') {
+                isFound = true;
+                var twillio_voice_cb_url = 'http://techmania.systems/api/twillioVoiceCb?msg_id=';
+                boomi = new Boomi({
+                  msg_id: message._id,
+                  user_id: voiceUsers._id,
+                  msg: message.msg,
+                  twillio_voice_cb_url: twillio_voice_cb_url+message._id,
+                  to_phone: voiceUsers.phone
+                });
+
+                // TODO need to save this - somehow!!!!!
+                console.log("Match found user ->" + voiceUsers.name + ", updating.."); // TODO remove
+
+              }
+            }
+
+          });
+
+      });
+
+      console.log(msg);
+      res.send(msg);
+    }
+  });*/
+
+});
+
 app.get('/api/voiceBoomi', function(req, res) {
   // find active messages
   var isFound = false;
@@ -303,6 +384,14 @@ app.post('/api/voiceBoomi', function(req, res) {
   */
   console.log(req.body); // TODO remove
   res.json(req.body);
+});
+
+app.get('/api/voiceBoomiGet', function(req, res) {
+  /*
+  localhost:3000/api/voiceBoomiGet?msg_id=5898e76e0d9c640c37a16814&user_id=5898e76e0d9c640c37a16814&sid=CAafae46854e1f347d2a1415b016202d2e
+  */
+  console.log(req.query); // TODO remove
+  res.json(req.query);
 });
 
 app.get('/api/smsBoomi', function(req, res) {
