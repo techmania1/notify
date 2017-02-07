@@ -359,6 +359,8 @@ app.post('/api/twillioStatusCb', function(req, res) {
 
 // callback for voice TWML - https://www.twilio.com/docs/api/twiml/say
 app.post('/api/twillioVoiceCb', function(req, res) {
+  //var voice_gather_url = '/api/twillioVoiceGather';
+  var voice_gather_url = 'http://requestb.in/14dxgzb1'; // TODO remove
   Msg.findById(req.query.msg_id, function(err, msg) {
     if(err) {
       console.log(err);
@@ -370,7 +372,7 @@ app.post('/api/twillioVoiceCb', function(req, res) {
       xw.startElement('Response');
 
       xw.startElement('Gather');
-      xw.writeAttribute('action', '/api/twillioVoiceGather');
+      xw.writeAttribute('action', voice_gather_url);
       xw.writeAttribute('method', 'POST');
       xw.writeAttribute('timeout', '10');
       xw.writeAttribute('finishOnKey', '#');
@@ -406,7 +408,7 @@ app.post('/api/twillioVoiceGather', function(req, res) {
 
   xw.startElement('Say');
   xw.writeAttribute('voice', 'alice');
-  xw.text('Thank you. Goodbye.');
+  xw.text('Thank you, goodbye.');
   xw.endElement();
 
   xw.endDocument();
