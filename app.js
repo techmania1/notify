@@ -368,9 +368,26 @@ app.post('/api/twillioVoiceCb', function(req, res) {
       xw = new XMLWriter;
       xw.startDocument();
       xw.startElement('Response');
+
+      xw.startElement('Gather');
+      xw.writeAttribute('action', '/api/twillioVoiceGather');
+      xw.writeAttribute('method', 'POST');
+      xw.writeAttribute('timeout', '10');
+      xw.writeAttribute('finishOnKey', '#');
+
       xw.startElement('Say');
       xw.writeAttribute('voice', 'alice');
       xw.text(msg.msg);
+      xw.endElement();
+
+      xw.startElement('Pause');
+      xw.endElement();
+
+      xw.startElement('Say');
+      xw.writeAttribute('voice', 'alice');
+      var gatherMsg = 'Please enter 1 for Yes, 2 for No, followed by the pound sign.';
+      xw.text(gatherMsg);
+
       xw.endDocument();
       console.log(xw.toString());
       res.set('Content-Type', 'text/xml');
@@ -380,7 +397,46 @@ app.post('/api/twillioVoiceCb', function(req, res) {
 
 });
 
+// callback for voice TWML - after gathering
+app.post('/api/twillioVoiceGather', function(req, res) {
+  Msg.findById(req.query.msg_id, function(err, msg) {
+    if(err) {
+      console.log(err);
+      res.status(500).json(err);
+    } else {
+      console.log(msg);
+      xw = new XMLWriter;
+      xw.startDocument();
+      xw.startElement('Response');
+      xw.startElement('Say');
+      xw.writeAttribute('voice', 'alice');
+      xw.text(msg.msg);
 
+      /*
+      <Gather timeout="10" finishOnKey="*">
+        <Say>Please enter your pin number and then press star.</Say>
+    </Gather>
+
+    <Response>
+    <Gather action="/process_gather.php" method="GET">
+        <Say>
+            Please enter your account number,
+            followed by the pound sign
+        </Say>
+    </Gather>
+    <Say>We didn't receive any input. Goodbye!</Say>
+</Response>
+
+      */
+
+      xw.endDocument();
+      console.log(xw.toString());
+      res.set('Content-Type', 'text/xml');
+      res.send(xw.toString());
+    }
+  });
+
+});
 
 /******************************
  * Internal
