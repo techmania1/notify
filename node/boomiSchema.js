@@ -11,7 +11,7 @@ var boomiSchema = new Schema({
   sip: { type: String, required: false },
   twillio_voice_cb_url: { type: String, required: false, default: 'http://techmania.systems/api/twillioVoiceCb' },
   twillio_status_cb_url: { type: String, required: false, default: 'http://techmania.systems/api/twillioStatusCb' }
-});
+},{ _id : false });
 
 // model
 var Boomi = mongoose.model('Boomi', boomiSchema);

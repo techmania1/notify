@@ -249,16 +249,14 @@ app.get('/api/voiceBoomi', function(req, res) {
               if(voiceUsers.name == 'Ricky Lewin') { // TODO remove!!!
               //if(voiceUsers.status == 'boomi-queued') {
                 isFound = true;
-                //var twillio_voice_cb_url = 'http://techmania.systems/api/twillioVoiceCb?msg_id=';
+                var twillio_voice_cb_url = 'http://techmania.systems/api/twillioVoiceCb?msg_id=';
                 boomi = new Boomi({
                   msg_id: message._id,
                   user_id: voiceUsers._id,
                   msg: message.msg,
-                  //twillio_voice_cb_url: twillio_voice_cb_url+message._id,
-                  twillio_voice_cb_url: 'http://techmania.systems/api/twillioVoiceCb',
+                  twillio_voice_cb_url: twillio_voice_cb_url+message._id,
                   to_phone: voiceUsers.phone
                 });
-
 
                 // TODO need to save this - somehow!!!!!
                 console.log("Match found user ->" + voiceUsers.name + ", updating.."); // TODO remove
