@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>api</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+
+<body>
+
+<h1>Misc</h1>
+<pre>
+
+// drop all users - CAREFUL!
+/api/dropAllUsers (DELETE)
+
+// drop all messages - CAREFUL!
+/api/dropAllMessages (DELETE)
+</pre>
+
+<h1>User</h1>
+<pre>
+// get all users
+/api/users (GET)
+
+</pre>
+<pre>
+// get single user by id
+/api/userById/:id (GET)
+
+</pre>
+<pre>
+// save user
+/api/user/ (POST)
+-param example:
+{
+	"name": "Cecil Stradford2",
+	"phone": "+9728410621",
+	"sms_enabled": true
+}
+</pre>
+<pre>
+
+// update user (PUT)
+/api/user/:id
+-param example:
+{
+	"name": "Cecil Stradford2",
+	"phone": "+9728410621",
+	"sms_enabled": true
+}
+
+</pre>
+<pre>
+// delete user (DELETE)
+/api/user/:id
+
+</pre>
+
+<h1>Msg</h1>
+<pre>
+// get all messages
+/api/msg (GET)
+
+</pre>
+<pre>
+// send a message
+/api/send (POST)
+-param example:
+{
+	"title": "Hello World",
+	"msg": "Techmania Rocks!",
+	"users": [{
+		"_id": "5898d3810f00552668a0f141",
+		"name": "Cecil Stradford",
+		"phone": "+19728410621",
+		"sms_enabled": true
+	}]
+}
+
+</pre>
+<pre>
+// TODO - WORKING!
+// get a voice message recipient
+/api/voiceBoomi (GET)
+
+</pre>
+<pre>
+// TODO - WORKING!
+// send back the Twillio SID
+/api/voiceBoomi (POST)
+-param example:
+{}
+
+</pre>
+<pre>
+// TODO - LAST!
+// get a sms message recipient
+/api/smsBoomi (GET)
+
+// TODO - DO LAST!
+// send back the Twillio SID
+/api/smsBoomi (POST)
+-param example:
+{}
+
+
+</pre>
+
+<h1>Twillio</h1>
+<pre>
+
+// TODO - WORKING
+// update status based on Twillio callback
+/api/twillioStatusCb (POST)
+-params[Twillio json object]
+
+</pre>
+<pre>
+// text-to-voice message
+/api/twillioVoiceCb/:id (POST)
+</pre>
+</body>
+</html>
