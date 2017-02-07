@@ -13,7 +13,8 @@ var msgSchema = new Schema({
         phone: { type: String, required: true },
         status: { type: String, required: false },
         update_dttm: { type: Date, required: false },
-        sms_enabled: { type: Boolean, required: true }
+        sms_enabled: { type: Boolean, required: true },
+        response: { type: String, required: false }
         /*user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
@@ -26,7 +27,8 @@ var msgSchema = new Schema({
           phone: { type: String, required: true },
           status: { type: String, required: true },
           update_dttm: { type: Date, required: true, default: Date.now },
-          sms_enabled: { type: Boolean, required: true }
+          sms_enabled: { type: Boolean, required: true },
+          response: { type: String, required: false }
           /*user: {
               type: mongoose.Schema.Types.ObjectId,
               ref: 'User',

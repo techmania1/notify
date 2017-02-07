@@ -1,8 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var voice_cb_url = 'http://techmania.systems/api/twillioVoiceCb';
-//var status_cb_url = 'http://techmania.systems/api/twillioStatusCb';
-var status_cb_url = 'http://requestb.in/14e9tb51'; // TODO remove
+var status_cb_url = 'http://techmania.systems/api/twillioStatusCb';
 // schema
 var boomiSchema = new Schema({
   msg_id: { type: String, required: true },

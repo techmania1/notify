@@ -167,7 +167,8 @@ app.post('/api/send', function(req, res) {
       _id: req.body.users[i]._id,
       name: req.body.users[i].name,
       phone: req.body.users[i].phone,
-      sms_enabled: req.body.users[i].phone
+      sms_enabled: req.body.users[i].phone,
+      response: ''
     };
     arrVoiceUsers.push(data);
     if(req.body.users[i].sms_enabled==true){
@@ -297,6 +298,9 @@ app.get('/api/voiceBoomi', function(req, res) {
 });
 
 app.post('/api/voiceBoomi', function(req, res) {
+  /*
+  { msg_id: 2, user_id: '12345',sid: 'CA02f88f8bae7431e4d50d7bba53dfc68c' }
+  */
   console.log(req.body); // TODO remove
   res.json(req.body);
 });
@@ -322,6 +326,11 @@ sms
 -MessageStatus
 */
 app.post('/api/twillioStatusCb', function(req, res) {
+
+  /*
+  CallStatus: completed
+  CallSid: CAf258403ac176507a0419d8ac4d4b7fd3
+  */
   console.log(req.body); // TODO remove
   res.json(req.body);
   /*var _id = req.body._id;
@@ -359,8 +368,7 @@ app.post('/api/twillioStatusCb', function(req, res) {
 
 // callback for voice TWML - https://www.twilio.com/docs/api/twiml/say
 app.post('/api/twillioVoiceCb', function(req, res) {
-  //var voice_gather_url = '/api/twillioVoiceGather';
-  var voice_gather_url = 'http://requestb.in/14dxgzb1'; // TODO remove
+  var voice_gather_url = '/api/twillioVoiceGather';
   Msg.findById(req.query.msg_id, function(err, msg) {
     if(err) {
       console.log(err);
@@ -401,7 +409,10 @@ app.post('/api/twillioVoiceCb', function(req, res) {
 
 // callback for voice TWML - after gathering
 app.post('/api/twillioVoiceGather', function(req, res) {
-
+/*
+CallSid: CAafae46854e1f347d2a1415b016202d2e
+Digits: 1
+*/
   xw = new XMLWriter;
   xw.startDocument();
   xw.startElement('Response');
