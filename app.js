@@ -152,7 +152,7 @@ app.delete('/api/user/:id', function(req, res) {
        console.log(msg);
        res.json(msg);
      }
-   });
+   }).sort({create_dttm: 'descending'});
  });
 
  // send msg
@@ -218,7 +218,8 @@ app.post('/api/sms', function(req, res) {
   res.json(req.body);
 });
 
-// boomi
+// boomi calls this and it will return one messages
+// at a time until there are no more messages.
 app.get('/api/voiceBoomi', function(req, res) {
   var isFound = false;
   var boomi = {};
@@ -233,6 +234,7 @@ app.get('/api/voiceBoomi', function(req, res) {
               var msgInstanceSnapshot = msgInstance;
               isFound = true;
               user.status = 'sending';
+              user.update_dttm = Date.now();
               Msg.findByIdAndUpdate(msgInstanceSnapshot, msgInstance,
                     {new : true}, function(err, msgNew) {
                   if(err) {
@@ -270,6 +272,7 @@ app.get('/api/voiceBoomi', function(req, res) {
   "sid": "CA02f88f8bae7431e4d50d7bba53dfc68c"
 }
 */
+// boomi calls this to return the sid after sending to Twillio
 app.post('/api/voiceBoomi', function(req, res) {
       var isFound = false;
       Msg.find({ status: 'active' }, function(err, msg) {
@@ -283,6 +286,7 @@ app.post('/api/voiceBoomi', function(req, res) {
                     var msgInstanceSnapshot = msgInstance;
                     isFound = true;
                     user.sid = req.body.sid;
+                    user.update_dttm = Date.now();
                     Msg.findByIdAndUpdate(msgInstanceSnapshot, msgInstance,
                           {new : true}, function(err, msgNew) {
                         if(err) {
@@ -310,6 +314,7 @@ app.post('/api/voiceBoomi', function(req, res) {
   /*
   /api/voiceBoomiGet?msg_id=5898e76e0d9c640c37a16814&user_id=5898e76e0d9c640c37a16814&sid=CAafae46854e1f347d2a1415b016202d2e
   */
+  // boomi calls this to return the sid after sending to Twillio
 app.get('/api/voiceBoomiGet', function(req, res) {
     var isFound = false;
     Msg.find({ status: 'active' }, function(err, msg) {
@@ -323,6 +328,7 @@ app.get('/api/voiceBoomiGet', function(req, res) {
                   var msgInstanceSnapshot = msgInstance;
                   isFound = true;
                   user.sid = req.query.sid;
+                  user.update_dttm = Date.now();
                   Msg.findByIdAndUpdate(msgInstanceSnapshot, msgInstance,
                         {new : true}, function(err, msgNew) {
                       if(err) {
@@ -379,6 +385,7 @@ app.post('/api/twillioStatusCb', function(req, res) {
                 var msgInstanceSnapshot = msgInstance;
                 isFound = true;
                 user.status = req.body.CallStatus;
+                user.update_dttm = Date.now();
                 Msg.findByIdAndUpdate(msgInstanceSnapshot, msgInstance,
                       {new : true}, function(err, msgNew) {
                     if(err) {
@@ -427,8 +434,8 @@ app.post('/api/twillioVoiceCb', function(req, res) {
       xw.text(msg.msg);
       xw.endElement();
 
-      xw.startElement('Pause');
-      xw.endElement();
+      //xw.startElement('Pause');
+      //xw.endElement();
 
       xw.startElement('Say');
       xw.writeAttribute('voice', 'alice');
@@ -461,6 +468,7 @@ app.post('/api/twillioVoiceGather', function(req, res) {
                 var msgInstanceSnapshot = msgInstance;
                 isFound = true;
                 user.response = req.body.Digits;
+                user.update_dttm = Date.now();
                 Msg.findByIdAndUpdate(msgInstanceSnapshot, msgInstance,
                       {new : true}, function(err, msgNew) {
                     if(err) {
