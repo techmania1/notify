@@ -439,7 +439,7 @@ app.post('/api/twillioVoiceCb', function(req, res) {
 
       xw.startElement('Say');
       xw.writeAttribute('voice', 'alice');
-      var gatherMsg = 'Please enter 1 for Yes, 2 for No, followed by the pound sign.';
+      var gatherMsg = 'Please enter 1 for Yes, any other key for No.  Press the pound key when done.';
       xw.text(gatherMsg);
 
       xw.endDocument();
