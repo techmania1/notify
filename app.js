@@ -160,21 +160,22 @@ app.post('/api/send', function(req, res) {
   // pre-populate voiceUsers and smsUsers arrays
   var arrVoiceUsers = [];
   var arrSmsUsers = [];
-  for(var i = 0; i < req.body.users.length; i++) {
+  req.body.users.forEach(function(user) {
     var data = {
-      status: 'boomi-queued',
+      status: 'queued',
       update_dttm: Date.now(),
-      _id: req.body.users[i]._id,
-      name: req.body.users[i].name,
-      phone: req.body.users[i].phone,
-      sms_enabled: req.body.users[i].phone,
-      response: ''
+      _id: user._id,
+      name: user.name,
+      phone: user.phone,
+      sms_enabled: user.sms_enabled,
+      response: '',
+      sid: ''
     };
     arrVoiceUsers.push(data);
-    if(req.body.users[i].sms_enabled==true){
+    if(user.sms_enabled==true){
       arrSmsUsers.push(data);
     }
-  }
+  });
 
   var msg = new Msg({
     title: req.body.title,
@@ -218,187 +219,140 @@ app.post('/api/sms', function(req, res) {
 });
 
 // boomi
-app.get('/api/voiceBoomi_NEW', function(req, res) {
-  // find active messages
-  //var isFound = false;
-  //var boomi = {};
-  //var filter = {};
-
-  /*var filter = {
-  	"status": "active",
-  	"voiceUsers": [{
-  		"status": "boomi-queued"
-  	}]
-  };*/
-
-  var voiceUserStatuses = ['boomi-queued'];
-  Msg.find({status:'active'})
-    //.populate('roles', null, { name: { $in: roles } } )
-    //.sort({'_id': 1})
-    .where('voiceUsers.status').in(voiceUserStatuses)
-    .exec(function (err, msg) {
-
-      // loop through messages
-      msg.forEach(function(message) {
-        console.log(message.msg);
-      });
-
-        /*users = users.filter(function(user){
-            return user.roles.length;
-        });*/
-
-        /*msg.save(function(err, msgNew) {
-          if (err) throw err;
-          console.log(msgNew);
-          res.send(msg);
-        });*/
-
-        console.log(msg);
-        res.send(msg);
-
-
-    });
-
-
-/*  Msg.find(filter, function(err, msg) {
-    if(err) {
-      console.log(err);
-      res.status(500).json(err);
-    } else {
-      // loop through messages
-      msg.forEach(function(message) {
-          console.log(message.msg);
-          message.voiceUsers.forEach(function(voiceUsers) {
-            if (isFound==false) {
-              if(voiceUsers.name == 'Ricky Lewin') { // TODO remove!!!
-              //if(voiceUsers.status == 'boomi-queued') {
-                isFound = true;
-                var twillio_voice_cb_url = 'http://techmania.systems/api/twillioVoiceCb?msg_id=';
-                boomi = new Boomi({
-                  msg_id: message._id,
-                  user_id: voiceUsers._id,
-                  msg: message.msg,
-                  twillio_voice_cb_url: twillio_voice_cb_url+message._id,
-                  to_phone: voiceUsers.phone
-                });
-
-                // TODO need to save this - somehow!!!!!
-                console.log("Match found user ->" + voiceUsers.name + ", updating.."); // TODO remove
-
-              }
-            }
-
-          });
-
-      });
-
-      console.log(msg);
-      res.send(msg);
-    }
-  });*/
-
-});
-
 app.get('/api/voiceBoomi', function(req, res) {
-  // find active messages
   var isFound = false;
   var boomi = {};
+  var twillio_voice_cb_url = 'http://techmania.systems/api/twillioVoiceCb?msg_id=';
   Msg.find({ status: 'active' }, function(err, msg) {
-    if(err) {
-      console.log(err);
-      res.status(500).json(err);
-    } else {
-      // loop through messages
-      msg.forEach(function(message) {
-        //if (isFound==false) {
-
-          console.log(message.msg);
-          // loop through voiceUsers and find
-          // those with 'boomi-queued' status
-          message.voiceUsers.forEach(function(voiceUsers) {
-            // update and return the first user
-            /*Msg.findByIdAndUpdate(req.params.id, req.body,
-                  {new : true}, function(err, user) {
-                if(err) {
-                  console.log(err);
-                  res.status(500).json(err);
-                } else {
-                  console.log(user);
-                  res.json(user);
-                };
-            });*/
-            if (isFound==false) {
-              if(voiceUsers.name == 'Ricky Lewin') { // TODO remove!!!
-              //if(voiceUsers.status == 'boomi-queued') {
-                isFound = true;
-                var twillio_voice_cb_url = 'http://techmania.systems/api/twillioVoiceCb?msg_id=';
-                boomi = new Boomi({
-                  msg_id: message._id,
-                  user_id: voiceUsers._id,
-                  msg: message.msg,
-                  twillio_voice_cb_url: twillio_voice_cb_url+message._id,
-                  to_phone: voiceUsers.phone
-                });
-
-                // TODO need to save this - somehow!!!!!
-                console.log("Match found user ->" + voiceUsers.name + ", updating.."); // TODO remove
-
-                /*
-                var msgOld = msg;
-                voiceUsers.status = 'boomi-sending';
-                Msg.findOneAndUpdate(msgOld, msg, function(err, msgNew) {
-                  if (err) throw err;
-                  console.log("new...");
-                  console.log(msgNew);
-                  //res.send(msgNew);
-                });*/
-
-                //console.log(msg);
-                //res.send(msg);
-
-                /*Msg.save(function(err, msg) {
-                  if (err) throw err;
-                  console.log('Msg successfully updated!');
-                  console.log(msg);
-                  res.send(msg);
-                });*/
-              }
+    // loop through messages
+    msg.forEach(function(msgInstance) {
+      // loop through voiceUsers
+      msgInstance.voiceUsers.forEach(function(user) {
+        if(isFound == false) {
+            if(user.status == 'queued') {
+              var msgInstanceSnapshot = msgInstance;
+              isFound = true;
+              user.status = 'sending';
+              Msg.findByIdAndUpdate(msgInstanceSnapshot, msgInstance,
+                    {new : true}, function(err, msgNew) {
+                  if(err) {
+                    console.log(err);
+                    res.status(500).json(err);
+                  } else {
+                    // populate response for Boomi
+                    boomi = new Boomi({
+                      msg_id: msgInstance._id,
+                      user_id: user._id,
+                      msg: msgInstance.msg,
+                      twillio_voice_cb_url: twillio_voice_cb_url+msgInstance._id,
+                      to_phone: user.phone
+                    });
+                    console.log(boomi);
+                    res.json(boomi);
+                  };
+              });
             }
-
-          });
-
-
-        //}
+          }
+        });
       });
-
-      console.log(boomi);
-      res.send(boomi);
-    }
-  });
-
+      // response if no queued messages
+      if(isFound == false) {
+        console.log("no queued messages");
+        res.json(boomi);
+      }
+    });
 });
 
+/*
+{
+  "msg_id": 2,
+  "user_id": "12345",
+  "sid": "CA02f88f8bae7431e4d50d7bba53dfc68c"
+}
+*/
 app.post('/api/voiceBoomi', function(req, res) {
-  /*
-  { msg_id: 2, user_id: '12345',sid: 'CA02f88f8bae7431e4d50d7bba53dfc68c' }
-  */
-  console.log(req.body); // TODO remove
-  res.json(req.body);
+      var isFound = false;
+      Msg.find({ status: 'active' }, function(err, msg) {
+        // loop through messages
+        msg.forEach(function(msgInstance) {
+          if(msgInstance._id == req.body.msg_id) {
+          // loop through voiceUsers
+            msgInstance.voiceUsers.forEach(function(user) {
+              if(isFound == false) {
+                if(user._id == req.body.user_id) {
+                    var msgInstanceSnapshot = msgInstance;
+                    isFound = true;
+                    user.sid = req.body.sid;
+                    Msg.findByIdAndUpdate(msgInstanceSnapshot, msgInstance,
+                          {new : true}, function(err, msgNew) {
+                        if(err) {
+                          console.log(err);
+                          res.status(500).json(err);
+                        } else {
+                          console.log(req.body);
+                          res.json(req.body);
+                        };
+                    });
+                  }
+                }
+              });
+            }
+          });
+          // response if no message found
+          if(isFound == false) {
+            console.log("message not found");
+            res.json({});
+          }
+    });
 });
 
+
+  /*
+  /api/voiceBoomiGet?msg_id=5898e76e0d9c640c37a16814&user_id=5898e76e0d9c640c37a16814&sid=CAafae46854e1f347d2a1415b016202d2e
+  */
 app.get('/api/voiceBoomiGet', function(req, res) {
-  /*
-  localhost:3000/api/voiceBoomiGet?msg_id=5898e76e0d9c640c37a16814&user_id=5898e76e0d9c640c37a16814&sid=CAafae46854e1f347d2a1415b016202d2e
-  */
-  console.log(req.query); // TODO remove
-  res.json(req.query);
+    var isFound = false;
+    Msg.find({ status: 'active' }, function(err, msg) {
+      // loop through messages
+      msg.forEach(function(msgInstance) {
+        if(msgInstance._id == req.query.msg_id) {
+        // loop through voiceUsers
+          msgInstance.voiceUsers.forEach(function(user) {
+            if(isFound == false) {
+              if(user._id == req.query.user_id) {
+                  var msgInstanceSnapshot = msgInstance;
+                  isFound = true;
+                  user.sid = req.query.sid;
+                  Msg.findByIdAndUpdate(msgInstanceSnapshot, msgInstance,
+                        {new : true}, function(err, msgNew) {
+                      if(err) {
+                        console.log(err);
+                        res.status(500).json(err);
+                      } else {
+                        console.log(req.query);
+                        res.json(req.query);
+                      };
+                  });
+                }
+              }
+            });
+          }
+        });
+        // response if no message found
+        if(isFound == false) {
+          console.log("message not found");
+          res.json({});
+        }
+  });
 });
 
+// DO LAST!
 app.get('/api/smsBoomi', function(req, res) {
   var DATA_FILE = path.join(__dirname, '/public/new_sms.json');
   res.sendFile(DATA_FILE);
 });
 
+// DO LAST!
 app.post('/api/smsBoomi', function(req, res) {
   console.log(req.body); // TODO remove
   res.json(req.body);
@@ -408,54 +362,48 @@ app.post('/api/smsBoomi', function(req, res) {
  * Twillio
  ******************************/
 
+ /*
+ CallStatus: completed
+ CallSid: CAf258403ac176507a0419d8ac4d4b7fd3
+ */
 // Twillio status callback - this will update status
-/*
-sms
--MessageSid
--MessageStatus
-*/
 app.post('/api/twillioStatusCb', function(req, res) {
-
-  /*
-  CallStatus: completed
-  CallSid: CAf258403ac176507a0419d8ac4d4b7fd3
-  */
-  console.log(req.body); // TODO remove
-  res.json(req.body);
-  /*var _id = req.body._id;
-  var twillio_id = req.body.twillio_id;
-  var status = req.body.status;
-  Msg.findById(_id, function(err, user) {
-    if(err) {
-      console.log(err);
-      res.status(500).json(err);
-    } else {
-      // TODO determine if this is sms or voice based on data from Twillio
-
-      for(var i = 0; i < user.voiceUsers.length; i++) {
-        if(user.voiceUsers[i]._id==twillio_id) {
-          console.log("found voice user->"+ user.voiceUsers[i].name); // TODO remove
-          user.voiceUsers[i].status = status;
-          user.voiceUsers[i].update_dttm = Date.now();
-        }
+  var isFound = false;
+  Msg.find({ status: 'active' }, function(err, msg) {
+    // loop through messages
+    msg.forEach(function(msgInstance) {
+      // loop through voiceUsers
+        msgInstance.voiceUsers.forEach(function(user) {
+          if(isFound == false) {
+            if(user.sid == req.body.CallSid) {
+                var msgInstanceSnapshot = msgInstance;
+                isFound = true;
+                user.status = req.body.CallStatus;
+                Msg.findByIdAndUpdate(msgInstanceSnapshot, msgInstance,
+                      {new : true}, function(err, msgNew) {
+                    if(err) {
+                      console.log(err);
+                      res.status(500).json(err);
+                    } else {
+                      console.log(req.body);
+                      res.json(req.body);
+                    };
+                });
+              }
+            }
+          });
+      });
+      // response if no cb user found
+      if(isFound == false) {
+        console.log("cb user not found");
+        res.json({});
       }
-
-      for(var i = 0; i < user.smsUsers.length; i++) {
-        if(user.smsUsers[i]._id==twillio_id) {
-          console.log("found sms user->"+ user.smsUsers[i].name); // TODO remove
-          user.smsUsers[i].status = status;
-          user.smsUsers[i].update_dttm = Date.now();
-        }
-      }
-      // save
-      user.save();
-      res.json(user);
-    }
-  });*/
+    });
 });
 
 
-// callback for voice TWML - https://www.twilio.com/docs/api/twiml/say
+// callback for voice TWIML - https://www.twilio.com/docs/api/twiml/say
+// sets status
 app.post('/api/twillioVoiceCb', function(req, res) {
   var voice_gather_url = '/api/twillioVoiceGather';
   Msg.findById(req.query.msg_id, function(err, msg) {
@@ -493,38 +441,58 @@ app.post('/api/twillioVoiceCb', function(req, res) {
       res.send(xw.toString());
     }
   });
-
 });
 
-// callback for voice TWML - after gathering
-app.post('/api/twillioVoiceGather', function(req, res) {
 /*
 CallSid: CAafae46854e1f347d2a1415b016202d2e
 Digits: 1
 */
-  xw = new XMLWriter;
-  xw.startDocument();
-  xw.startElement('Response');
+// callback for voice TWML - after gathering digits
+// sets response value
+app.post('/api/twillioVoiceGather', function(req, res) {
+  var isFound = false;
+  Msg.find({ status: 'active' }, function(err, msg) {
+    // loop through messages
+    msg.forEach(function(msgInstance) {
+      // loop through voiceUsers
+        msgInstance.voiceUsers.forEach(function(user) {
+          if(isFound == false) {
+            if(user.sid == req.body.CallSid) {
+                var msgInstanceSnapshot = msgInstance;
+                isFound = true;
+                user.response = req.body.Digits;
+                Msg.findByIdAndUpdate(msgInstanceSnapshot, msgInstance,
+                      {new : true}, function(err, msgNew) {
+                    if(err) {
+                      console.log(err);
+                      //res.status(500).json(err);
+                    }
+                });
+              }
+            }
+          });
+      });
+      // response if no cb user found
+      if(isFound == false) {
+        console.log("cb user not found");
+        res.json({});
+      }
+    });
 
-  xw.startElement('Say');
-  xw.writeAttribute('voice', 'alice');
-  xw.text('Thank you, goodbye.');
-  xw.endElement();
+    // send response
+    xw = new XMLWriter;
+    xw.startDocument();
+    xw.startElement('Response');
 
-  xw.endDocument();
-  console.log(xw.toString());
-  res.set('Content-Type', 'text/xml');
-  res.send(xw.toString());
+    xw.startElement('Say');
+    xw.writeAttribute('voice', 'alice');
+    xw.text('Thank you, goodbye.');
+    xw.endElement();
 
-  /*Msg.findById(req.body.msg_id, function(err, msg) {
-    if(err) {
-      console.log(err);
-      res.status(500).json(err);
-    } else {
-      .. //
-      res.json(msg);
-    }
-  });*/
+    xw.endDocument();
+    console.log(xw.toString());
+    res.set('Content-Type', 'text/xml');
+    res.send(xw.toString());
 
 });
 
