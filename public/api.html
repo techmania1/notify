@@ -10,14 +10,6 @@
 <body>
 
 <h1>Misc</h1>
-<pre>
-
-// drop all users - CAREFUL!
-/api/dropAllUsers (DELETE)
-
-// drop all messages - CAREFUL!
-/api/dropAllMessages (DELETE)
-</pre>
 
 <h1>User</h1>
 <pre>
@@ -33,23 +25,11 @@
 <pre>
 // save user
 /api/user/ (POST)
--param example:
-{
-	"name": "Cecil Stradford2",
-	"phone": "+9728410621",
-	"sms_enabled": true
-}
 </pre>
 <pre>
 
 // update user (PUT)
 /api/user/:id
--param example:
-{
-	"name": "Cecil Stradford2",
-	"phone": "+9728410621",
-	"sms_enabled": true
-}
 
 </pre>
 <pre>
@@ -67,33 +47,19 @@
 <pre>
 // send a message
 /api/send (POST)
--param example:
-{
-	"title": "Hello World",
-	"msg": "Techmania Rocks!",
-	"users": [{
-		"_id": "5898d3810f00552668a0f141",
-		"name": "Cecil Stradford",
-		"phone": "+19728410621",
-		"sms_enabled": true
-	}]
-}
 
 </pre>
 <pre>
-// TODO - WORKING!
 // get a voice message recipient
 /api/voiceBoomi (GET)
 
 </pre>
 <pre>
-// TODO - WORKING!
 // send back the Twillio SID
 /api/voiceBoomi (POST)
--param example:
-{}
 
 </pre>
+<!--
 <pre>
 // TODO - LAST!
 // get a sms message recipient
@@ -107,11 +73,10 @@
 
 
 </pre>
-
+-->
 <h1>Twillio</h1>
 <pre>
 
-// TODO - WORKING
 // update status based on Twillio callback
 /api/twillioStatusCb (POST)
 -params[Twillio json object]
